@@ -70,68 +70,72 @@ public class MainActivity extends AppCompatActivity {
 
         StringBuilder s = new StringBuilder();
 
-        Cursor cursor = getContentResolver().query(
-                metaUri, null, null, null, null);
-
         try {
-            while (cursor.moveToNext()) {
-                s.append("====== META ======");
-                s.append(System.lineSeparator());
+            Cursor cursor = getContentResolver().query(
+                    metaUri, null, null, null, null);
 
-                for (int i = 0; i < cursor.getColumnCount(); ++i) {
-                    s.append(" - ").append(cursor.getColumnName(i));
-                    s.append(": ").append(cursor.getString(i));
+            try {
+                while (cursor.moveToNext()) {
+                    s.append("====== META ======");
                     s.append(System.lineSeparator());
-                }
-            }
-        }
-        finally {
-            cursor.close();
-        }
 
-        cursor = getContentResolver().query(
-                usersUri, null, null, null, null);
-
-        try {
-            int user = 0;
-            while (cursor.moveToNext()) {
-                s.append("====== USER ");
-                s.append(++user).append("/").append(cursor.getCount());
-                s.append(" ======");
-                s.append(System.lineSeparator());
-
-                for (int i = 0; i < cursor.getColumnCount(); ++i) {
-                    s.append(" - ").append(cursor.getColumnName(i));
-                    s.append(": ").append(cursor.getString(i));
-                    s.append(System.lineSeparator());
-                }
-
-                long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
-                Cursor m = getContentResolver().query(
-                        ContentUris.withAppendedId(measurementsUri, userId),
-                        null, null, null, null);
-
-                try {
-                    int measurement = 0;
-                    while (m.moveToNext()) {
-                        s.append("++++++ MEASUREMENT ");
-                        s.append(++measurement).append("/").append(m.getCount());
-                        s.append(" ++++++");
+                    for (int i = 0; i < cursor.getColumnCount(); ++i) {
+                        s.append(" - ").append(cursor.getColumnName(i));
+                        s.append(": ").append(cursor.getString(i));
                         s.append(System.lineSeparator());
-                        for (int i = 0; i < m.getColumnCount(); ++i) {
-                            s.append("  * ").append(m.getColumnName(i));
-                            s.append(": ").append(m.getString(i));
-                            s.append(System.lineSeparator());
-                        }
                     }
                 }
-                finally {
-                    m.close();
+            } finally {
+                cursor.close();
+            }
+
+            cursor = getContentResolver().query(
+                    usersUri, null, null, null, null);
+
+            try {
+                int user = 0;
+                while (cursor.moveToNext()) {
+                    s.append("====== USER ");
+                    s.append(++user).append("/").append(cursor.getCount());
+                    s.append(" ======");
+                    s.append(System.lineSeparator());
+
+                    for (int i = 0; i < cursor.getColumnCount(); ++i) {
+                        s.append(" - ").append(cursor.getColumnName(i));
+                        s.append(": ").append(cursor.getString(i));
+                        s.append(System.lineSeparator());
+                    }
+
+                    long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+                    Cursor m = getContentResolver().query(
+                            ContentUris.withAppendedId(measurementsUri, userId),
+                            null, null, null, null);
+
+                    try {
+                        int measurement = 0;
+                        while (m.moveToNext()) {
+                            s.append("++++++ MEASUREMENT ");
+                            s.append(++measurement).append("/").append(m.getCount());
+                            s.append(" ++++++");
+                            s.append(System.lineSeparator());
+                            for (int i = 0; i < m.getColumnCount(); ++i) {
+                                s.append("  * ").append(m.getColumnName(i));
+                                s.append(": ").append(m.getString(i));
+                                s.append(System.lineSeparator());
+                            }
+                        }
+                    } finally {
+                        m.close();
+                    }
                 }
+            } finally {
+                cursor.close();
             }
         }
-        finally {
-            cursor.close();
+        catch (Exception e) {
+            s.append(System.lineSeparator());
+            s.append("Error: ");
+            s.append(e);
         }
         TextView text = findViewById(R.id.mainText);
         text.setText(s.toString());
